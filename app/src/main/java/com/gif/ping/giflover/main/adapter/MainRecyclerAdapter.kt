@@ -3,6 +3,7 @@ package com.gif.ping.giflover.main.adapter
 import android.content.Context
 import android.content.Intent
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,7 +14,6 @@ import com.bumptech.glide.request.RequestOptions
 import com.example.yuanping.gifbin.bean.GifBeans
 import com.gif.ping.giflover.R
 import com.gif.ping.giflover.play.view.GifPlayActivity
-import org.jetbrains.anko.startActivity
 
 /**
  * @created by PingYuan at 11/3/18
@@ -21,8 +21,8 @@ import org.jetbrains.anko.startActivity
  * @description:
  */
 
-class RecyclerAdapter(val context: Context, val gifBeans: GifBeans) :
-    RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
+class MainRecyclerAdapter(val context: Context, val gifBeans: GifBeans) :
+    RecyclerView.Adapter<MainRecyclerAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(p0: ViewGroup, p1: Int): ViewHolder {
         val view = LayoutInflater.from(context)
@@ -45,6 +45,9 @@ class RecyclerAdapter(val context: Context, val gifBeans: GifBeans) :
         p0.item_text.text = gifBeans.gifs[p1].title
         (p0.item_img.parent as View).setOnClickListener {
             val intent = Intent(context, GifPlayActivity::class.java)
+            intent.putExtra(GifPlayActivity.CUR_URL, gifBeans.gifs[p1])
+            intent.putExtra(GifPlayActivity.PAGE, gifBeans.page)
+            intent.putExtra(GifPlayActivity.TAG, gifBeans.tag)
             context.startActivity(intent)
         }
     }

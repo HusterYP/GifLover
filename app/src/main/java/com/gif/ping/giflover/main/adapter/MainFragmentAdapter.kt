@@ -11,7 +11,7 @@ import com.gif.ping.giflover.main.view.MainFragment
  * @email: husteryp@gmail.com
  * @description:
  */
-class FragmentAdapter : FragmentPagerAdapter {
+class MainFragmentAdapter : FragmentPagerAdapter {
 
     private var titles: List<String>
 

@@ -11,15 +11,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.yuanping.gifbin.bean.GifBeans
-import com.example.yuanping.gifbin.utils.ParseUtil
 import com.example.yuanping.gifbin.utils.postDelayed
 import com.example.yuanping.gifbin.utils.toast
 import com.gif.ping.giflover.R
-import com.gif.ping.giflover.main.adapter.RecyclerAdapter
+import com.gif.ping.giflover.main.adapter.MainRecyclerAdapter
 import com.gif.ping.giflover.main.module.MainModule
 import com.gif.ping.giflover.main.presenter.IMainView
 import com.gif.ping.giflover.main.presenter.MainPresenter
-import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_main.*
 
 /**
@@ -35,7 +33,7 @@ class MainFragment : Fragment, IMainView {
     private var isInit = false
     private var rootView: View? = null // 缓存rootView
     private lateinit var mainRecycler: RecyclerView
-    private lateinit var adapter: RecyclerAdapter
+    private lateinit var adapter: MainRecyclerAdapter
 
     constructor(title: String) : super() {
         presenter = MainPresenter(this, MainModule(title))
@@ -104,7 +102,7 @@ class MainFragment : Fragment, IMainView {
 
     override fun setAdapter(gifBeans: GifBeans) {
         fragment_rv_main.layoutManager = LinearLayoutManager(context)
-        adapter = RecyclerAdapter(context!!, gifBeans)
+        adapter = MainRecyclerAdapter(context!!, gifBeans)
         fragment_rv_main.adapter = adapter
     }
 
