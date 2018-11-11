@@ -7,7 +7,8 @@ package com.gif.ping.giflover
  */
 
 object Constant {
-    const val baseUrl = "http://www.gifbin.com"
-    const val htmlBaseUrl = "http://www.gifbin.com/tag"
-    const val testUrl = "$htmlBaseUrl/funny/1"
+    const val PACKAGE_NAME = "com.gif.ping.giflover"
+    const val BASE_URL = "http://www.gifbin.com"
+    const val HTML_BASE_URL = "http://www.gifbin.com/tag"
+    const val testUrl = "$HTML_BASE_URL/funny/1"
 }

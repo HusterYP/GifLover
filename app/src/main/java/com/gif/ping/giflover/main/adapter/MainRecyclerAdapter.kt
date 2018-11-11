@@ -46,7 +46,7 @@ class MainRecyclerAdapter(val context: Context, val gifBeans: GifBeans) :
         (p0.item_img.parent as View).setOnClickListener {
             val intent = Intent(context, GifPlayActivity::class.java)
             intent.putExtra(GifPlayActivity.CUR_URL, gifBeans.gifs[p1])
-            intent.putExtra(GifPlayActivity.PAGE, gifBeans.page)
+            intent.putExtra(GifPlayActivity.PAGE, gifBeans.gifs[p1].page)
             intent.putExtra(GifPlayActivity.TAG, gifBeans.tag)
             context.startActivity(intent)
         }

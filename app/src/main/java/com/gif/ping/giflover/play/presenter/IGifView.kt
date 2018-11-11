@@ -1,6 +1,6 @@
 package com.gif.ping.giflover.play.presenter
 
-import com.example.yuanping.gifbin.bean.GifBeans
+import com.example.yuanping.gifbin.bean.GifBean
 
 /**
  * @created by PingYuan at 11/10/18
@@ -8,5 +8,5 @@ import com.example.yuanping.gifbin.bean.GifBeans
  * @description:
  */
 interface IGifView {
-    fun setAdapter(gifBeans: GifBeans)
+    fun setAdapter(gifBeans: ArrayList<GifBean>, position: Int)
 }

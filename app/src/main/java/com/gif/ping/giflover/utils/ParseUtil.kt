@@ -1,6 +1,5 @@
 package com.example.yuanping.gifbin.utils
 
-import android.util.Log
 import com.example.yuanping.gifbin.bean.GifBean
 import com.gif.ping.giflover.Application
 import com.gif.ping.giflover.Constant
@@ -31,7 +30,7 @@ object ParseUtil {
                 val gifBean = GifBean()
                 gifBean.title = element.select("a")
                     .attr("title")
-                gifBean.placeholder = "${Constant.baseUrl}${element.select("img").attr("src")}"
+                gifBean.placeholder = "${Constant.BASE_URL}${element.select("img").attr("src")}"
                 gifBean.gif =
                         "${gifBean.placeholder.substring(0, gifBean.placeholder.lastIndexOf("/") + 1
                         )}${gifBean.placeholder.substring(gifBean.placeholder.lastIndexOf("/") + 1).split(
@@ -54,7 +53,7 @@ object ParseUtil {
             if (result == null) {
                 if (StateUtil.isNetworkConnected()) {
                     try {
-                        val url = "${Constant.htmlBaseUrl}/$tag/$page"
+                        val url = "${Constant.HTML_BASE_URL}/$tag/$page"
                         val document = Jsoup.connect(url)
                             .get()
                         val elements = document.select("div.browse-thumbs-inner")
@@ -63,13 +62,14 @@ object ParseUtil {
                             gifBean.title = element.select("a")
                                 .attr("title")
                             gifBean.placeholder =
-                                    "${Constant.baseUrl}${element.select("img").attr("src")}"
+                                    "${Constant.BASE_URL}${element.select("img").attr("src")}"
                             gifBean.gif = "${gifBean.placeholder.substring(0,
                                 gifBean.placeholder.lastIndexOf("/") + 1
                             )}${gifBean.placeholder.substring(gifBean.placeholder.lastIndexOf("/") + 1).split(
                                 "."
                             )[0].removeRange(0, 3
                             )}.webm"
+                            gifBean.page = page
                             gifBeans.add(gifBean)
                         }
                         it.onNext(gifBeans)

@@ -3,7 +3,7 @@ package com.gif.ping.giflover.play.adapter
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
-import com.example.yuanping.gifbin.bean.GifBeans
+import com.example.yuanping.gifbin.bean.GifBean
 import com.gif.ping.giflover.play.view.GifPlayFragment
 
 /**
@@ -13,18 +13,18 @@ import com.gif.ping.giflover.play.view.GifPlayFragment
  */
 class GifPlayFragmentAdapter : FragmentPagerAdapter {
 
-    private var gifBeans: GifBeans
+    private var gifBeans: ArrayList<GifBean>
 
-    constructor(manager: FragmentManager, gifBeans: GifBeans) : super(manager) {
+    constructor(manager: FragmentManager, gifBeans: ArrayList<GifBean>) : super(manager) {
         this.gifBeans = gifBeans
     }
 
     override fun getItem(position: Int): Fragment {
-        return GifPlayFragment.getInstance(gifBeans.gifs[position])
+        return GifPlayFragment.getInstance(gifBeans[position])
     }
 
     override fun getCount(): Int {
-        return gifBeans.gifs.size
+        return gifBeans.size
     }
 
 }

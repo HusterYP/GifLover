@@ -4,7 +4,6 @@ import android.graphics.drawable.ColorDrawable
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import com.example.yuanping.gifbin.bean.GifBean
-import com.example.yuanping.gifbin.bean.GifBeans
 import com.example.yuanping.gifbin.utils.immersiveStatusBar
 import com.gif.ping.giflover.R
 import com.gif.ping.giflover.play.adapter.GifPlayFragmentAdapter
@@ -48,15 +47,18 @@ class GifPlayActivity : AppCompatActivity(), IGifView {
         gifBean = intent.getSerializableExtra(CUR_URL) as GifBean
         page = intent.getIntExtra(PAGE, 1)
 
+        play_pager.offscreenPageLimit = 0
+
         presenter = GifPlayPresenter(page, tag, this)
     }
 
     // 第一次初始化播放列表
     private fun initPlay() {
-        presenter.initPlaySet(gifBean.gif)
+        presenter.loadMorePlaySet(gifBean)
     }
 
-    override fun setAdapter(gifBeans: GifBeans) {
+    override fun setAdapter(gifBeans: ArrayList<GifBean>, position: Int) {
         play_pager.adapter = GifPlayFragmentAdapter(supportFragmentManager, gifBeans)
+        play_pager.currentItem = position
     }
 }
