@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun onPageSelected(position: Int) {
-            val page = supportFragmentManager.findFragmentByTag("android:switcher:" + main_pager.id + ":" + main_pager.currentItem) as MainFragment
+            val page = supportFragmentManager.findFragmentByTag("android:switcher:${main_pager.id}:${main_pager.currentItem}") as MainFragment
             page.initView()
         }
     }

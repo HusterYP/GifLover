@@ -50,6 +50,7 @@ class GifPlayFragment : Fragment {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         isCreate = true
+        Log.d("@HusterYP","onCreate")
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -58,20 +59,20 @@ class GifPlayFragment : Fragment {
         return view
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        player?.release()
-        player = null
-    }
-
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         super.setUserVisibleHint(isVisibleToUser)
-        if (isVisibleToUser && isCreate) {
-            initPlay()
-        }
+//        if (isVisibleToUser && isCreate) {
+//            initPlay()
+//        }
     }
 
-    private fun initPlay() {
+    override fun onDestroyView() {
+        releasePlayer()
+        super.onDestroyView()
+    }
+
+    fun initPlay() {
+        Log.d("@HusterYP","initPlay")
         val selector = DefaultTrackSelector()
         player = ExoPlayerFactory.newSimpleInstance(context, selector)
         playerView.player = player
@@ -84,4 +85,10 @@ class GifPlayFragment : Fragment {
         player?.playWhenReady = true
     }
 
+    fun releasePlayer() {
+        player?.release()
+        player?.stop(true)
+        playerView.player?.release()
+        playerView.player = null
+    }
 }

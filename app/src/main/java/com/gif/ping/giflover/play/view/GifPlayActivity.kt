@@ -3,13 +3,17 @@ package com.gif.ping.giflover.play.view
 import android.graphics.drawable.ColorDrawable
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v4.view.ViewPager
+import android.util.Log
 import com.example.yuanping.gifbin.bean.GifBean
 import com.example.yuanping.gifbin.utils.immersiveStatusBar
 import com.gif.ping.giflover.R
+import com.gif.ping.giflover.main.view.MainFragment
 import com.gif.ping.giflover.play.adapter.GifPlayFragmentAdapter
 import com.gif.ping.giflover.play.presenter.GifPlayPresenter
 import com.gif.ping.giflover.play.presenter.IGifView
 import kotlinx.android.synthetic.main.activity_gif_play.*
+import kotlinx.android.synthetic.main.activity_main.*
 
 class GifPlayActivity : AppCompatActivity(), IGifView {
 
@@ -24,6 +28,28 @@ class GifPlayActivity : AppCompatActivity(), IGifView {
     private lateinit var gifBean: GifBean
     private lateinit var presenter: GifPlayPresenter
     private var isInit = false
+    private val pageChangeListener = object : ViewPager.OnPageChangeListener {
+        private var lastIndex = 0
+        private var isChanged = false
+        override fun onPageScrollStateChanged(state: Int) {
+        }
+
+        override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+        }
+
+        override fun onPageSelected(position: Int) {
+            play_pager.post{
+                val curPage = supportFragmentManager.findFragmentByTag("android:switcher:${play_pager.id}:${play_pager.currentItem}") as GifPlayFragment
+                curPage.initPlay()
+            }
+            if (isChanged) {
+                val lastPage = supportFragmentManager.findFragmentByTag("android:switcher:${play_pager.id}:$lastIndex") as GifPlayFragment
+                lastPage.releasePlayer()
+            }
+            isChanged = true
+            lastIndex = position
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,7 +73,7 @@ class GifPlayActivity : AppCompatActivity(), IGifView {
         gifBean = intent.getSerializableExtra(CUR_URL) as GifBean
         page = intent.getIntExtra(PAGE, 1)
 
-        play_pager.offscreenPageLimit = 0
+        play_pager.addOnPageChangeListener(pageChangeListener)
 
         presenter = GifPlayPresenter(page, tag, this)
     }
