@@ -1,8 +1,6 @@
 package com.gif.ping.giflover.play.presenter
 
-import android.util.Log
 import com.example.yuanping.gifbin.bean.GifBean
-import com.example.yuanping.gifbin.bean.GifBeans
 import com.gif.ping.giflover.play.module.GifPlayModule
 
 /**
@@ -20,12 +18,17 @@ class GifPlayPresenter : GifPlayModule.OnStateChangeListener {
         this.gifView = gifView
     }
 
-    fun loadMorePlaySet(curGif: GifBean? = null) {
-        module.loadPlaySet(this)
+    fun initPlaySet(curGif: GifBean? = null) {
+        module.initPlaySet(this)
         this.curGif = curGif
     }
 
-    override fun onLoadPlaySetSucceed(gifBeans: ArrayList<GifBean>) {
+    fun loadMorePage(isNext: Boolean = true) {
+        if (isNext) module.loadMorePlaySet(this, true)
+        else module.loadMorePlaySet(this, false)
+    }
+
+    override fun onInitPlaySucceed(gifBeans: ArrayList<GifBean>) {
         curGif?.apply {
             val index = gifBeans.indexOfFirst {
                 it.gif == this.gif
@@ -39,5 +42,9 @@ class GifPlayPresenter : GifPlayModule.OnStateChangeListener {
     }
 
     override fun noMorePlaySet() {
+    }
+
+    override fun loadMoreSucceed(gifBeans: ArrayList<GifBean>, isNext: Boolean) {
+        gifView.updateAdapter(gifBeans, isNext)
     }
 }

@@ -35,7 +35,6 @@ class GifPlayFragment : Fragment {
     private var gifBean: GifBean
     private lateinit var playerView: PlayerView
     private var player: SimpleExoPlayer? = null
-    private var isCreate = false
 
     companion object {
         fun getInstance(gifBean: GifBean): GifPlayFragment {
@@ -47,23 +46,10 @@ class GifPlayFragment : Fragment {
         this.gifBean = gifBean
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        isCreate = true
-        Log.d("@HusterYP","onCreate")
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_gif_play, container, false)
         playerView = view.findViewById(R.id.player_view)
         return view
-    }
-
-    override fun setUserVisibleHint(isVisibleToUser: Boolean) {
-        super.setUserVisibleHint(isVisibleToUser)
-//        if (isVisibleToUser && isCreate) {
-//            initPlay()
-//        }
     }
 
     override fun onDestroyView() {
@@ -72,7 +58,6 @@ class GifPlayFragment : Fragment {
     }
 
     fun initPlay() {
-        Log.d("@HusterYP","initPlay")
         val selector = DefaultTrackSelector()
         player = ExoPlayerFactory.newSimpleInstance(context, selector)
         playerView.player = player

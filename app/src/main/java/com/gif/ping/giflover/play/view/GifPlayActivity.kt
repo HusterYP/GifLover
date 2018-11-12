@@ -8,12 +8,10 @@ import android.util.Log
 import com.example.yuanping.gifbin.bean.GifBean
 import com.example.yuanping.gifbin.utils.immersiveStatusBar
 import com.gif.ping.giflover.R
-import com.gif.ping.giflover.main.view.MainFragment
 import com.gif.ping.giflover.play.adapter.GifPlayFragmentAdapter
 import com.gif.ping.giflover.play.presenter.GifPlayPresenter
 import com.gif.ping.giflover.play.presenter.IGifView
 import kotlinx.android.synthetic.main.activity_gif_play.*
-import kotlinx.android.synthetic.main.activity_main.*
 
 class GifPlayActivity : AppCompatActivity(), IGifView {
 
@@ -38,12 +36,22 @@ class GifPlayActivity : AppCompatActivity(), IGifView {
         }
 
         override fun onPageSelected(position: Int) {
-            play_pager.post{
-                val curPage = supportFragmentManager.findFragmentByTag("android:switcher:${play_pager.id}:${play_pager.currentItem}") as GifPlayFragment
+            play_pager.post {
+                // 提前加载下一页
+                if (position + 2 == play_pager.adapter!!.count) {
+                    Log.d("@HusterYP", "loadNext")
+                    presenter.loadMorePage(true)
+                } else if (position == 1) {
+                    presenter.loadMorePage(false)
+                    Log.d("@HusterYP", "loadPre")
+                }
+                val curPage =
+                    supportFragmentManager.findFragmentByTag("android:switcher:${play_pager.id}:${play_pager.currentItem}") as GifPlayFragment
                 curPage.initPlay()
             }
             if (isChanged) {
-                val lastPage = supportFragmentManager.findFragmentByTag("android:switcher:${play_pager.id}:$lastIndex") as GifPlayFragment
+                val lastPage =
+                    supportFragmentManager.findFragmentByTag("android:switcher:${play_pager.id}:$lastIndex") as GifPlayFragment
                 lastPage.releasePlayer()
             }
             isChanged = true
@@ -80,11 +88,21 @@ class GifPlayActivity : AppCompatActivity(), IGifView {
 
     // 第一次初始化播放列表
     private fun initPlay() {
-        presenter.loadMorePlaySet(gifBean)
+        presenter.initPlaySet(gifBean)
     }
 
     override fun setAdapter(gifBeans: ArrayList<GifBean>, position: Int) {
         play_pager.adapter = GifPlayFragmentAdapter(supportFragmentManager, gifBeans)
         play_pager.currentItem = position
+    }
+
+    override fun updateAdapter(gifBeans: ArrayList<GifBean>, isNext: Boolean) {
+        if (isNext) (play_pager.adapter as GifPlayFragmentAdapter).gifBeans.addAll(gifBeans)
+        else {
+            val size = gifBeans.size
+            gifBeans.addAll((play_pager.adapter as GifPlayFragmentAdapter).gifBeans)
+            setAdapter(gifBeans, play_pager.currentItem + size)
+        }
+        play_pager.adapter?.notifyDataSetChanged()
     }
 }

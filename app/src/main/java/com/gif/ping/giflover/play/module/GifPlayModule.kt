@@ -2,7 +2,6 @@ package com.gif.ping.giflover.play.module
 
 import com.example.yuanping.gifbin.bean.GifBean
 import com.example.yuanping.gifbin.utils.ParseUtil
-import com.gif.ping.giflover.Constant
 import io.reactivex.android.schedulers.AndroidSchedulers
 
 /**
@@ -16,8 +15,9 @@ class GifPlayModule {
     private var tag: String
 
     interface OnStateChangeListener {
-        fun onLoadPlaySetSucceed(gifBeans: ArrayList<GifBean>)
+        fun onInitPlaySucceed(gifBeans: ArrayList<GifBean>)
         fun noMorePlaySet()
+        fun loadMoreSucceed(gifBeans: ArrayList<GifBean>, isNext: Boolean = true)
     }
 
     constructor(page: Int, tag: String) {
@@ -26,15 +26,41 @@ class GifPlayModule {
         this.tag = tag
     }
 
-    fun loadPlaySet(stateChangeListener: OnStateChangeListener) {
+    fun initPlaySet(stateChangeListener: OnStateChangeListener) {
         ParseUtil.parseHtml(tag, firstPage)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
                 if (it.size <= 0) {
                     stateChangeListener.noMorePlaySet()
                 } else {
-                    stateChangeListener.onLoadPlaySetSucceed(it)
+                    stateChangeListener.onInitPlaySucceed(it)
                 }
             }
+    }
+
+    fun loadMorePlaySet(stateChangeListener: OnStateChangeListener, isNext: Boolean = true) {
+        when {
+            isNext -> ParseUtil.parseHtml(tag,
+                ++lastPage
+            ).observeOn(AndroidSchedulers.mainThread()).subscribe {
+                if (it.size <= 0) {
+                    // TODO 没有更多提示, 需要注意这里是加载更多的时候, 而不是初次加载
+                } else {
+                    stateChangeListener.loadMoreSucceed(it, true)
+                }
+            }
+            --firstPage > 0 -> ParseUtil.parseHtml(tag,
+                firstPage
+            ).observeOn(AndroidSchedulers.mainThread()).subscribe {
+                if (it.size <= 0) {
+                    // TODO 没有更多提示, 需要注意这里是加载更多的时候, 而不是初次加载
+                } else {
+                    stateChangeListener.loadMoreSucceed(it, false)
+                }
+            }
+            else -> {
+                // TODO 没有更多提示, 需要注意这里是加载更多的时候, 而不是初次加载
+            }
+        }
     }
 }

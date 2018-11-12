@@ -13,7 +13,7 @@ import com.gif.ping.giflover.play.view.GifPlayFragment
  */
 class GifPlayFragmentAdapter : FragmentPagerAdapter {
 
-    private var gifBeans: ArrayList<GifBean>
+    var gifBeans: ArrayList<GifBean>
 
     constructor(manager: FragmentManager, gifBeans: ArrayList<GifBean>) : super(manager) {
         this.gifBeans = gifBeans
