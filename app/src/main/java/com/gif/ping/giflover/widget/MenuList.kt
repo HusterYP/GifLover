@@ -12,13 +12,13 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.Gravity
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
-import android.view.animation.AccelerateInterpolator
 import android.view.animation.AnticipateInterpolator
 import android.view.animation.BounceInterpolator
 import android.widget.FrameLayout
 import com.gif.ping.giflover.R
 import com.gif.ping.giflover.utils.ScreenUtil
 import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.sin
 
 /**
@@ -33,16 +33,13 @@ class MenuList : FrameLayout {
     var fabSearch: FloatingActionButton = FloatingActionButton(context)
     var fabSetting: FloatingActionButton = FloatingActionButton(context)
     private var isMenuOpen = false
-    private var isOpenLayer = false
     private val RADIUS = 300
     private val RADIUS_CENTER = 260
     private val MAX_RADIUS = max(ScreenUtil.getDeviceHeight(), ScreenUtil.getDeviceWidth())
     private lateinit var animator: ValueAnimator
-    private lateinit var layerAnimator : ValueAnimator
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var curUpdatePercent = 0.0f
     private var newLayerUpdatePercent = 0
-    private var oldLayerUpdatePercent = newLayerUpdatePercent
 
     constructor(context: Context) : super(context)
 
@@ -54,29 +51,23 @@ class MenuList : FrameLayout {
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
 
     init {
-        setWillNotDraw(false)
         initView()
+        setWillNotDraw(false)
         fabMenu.setOnClickListener {
-            isOpenLayer = !isOpenLayer
+            if (isMenuOpen) fabMenu.animate().rotationBy(315f).setInterpolator(BounceInterpolator()).setDuration(2000).start()
+            else fabMenu.animate().rotationBy(-315f).setInterpolator(BounceInterpolator()).setDuration(2000).start()
             animator = ValueAnimator.ofFloat(0f, 100f)
             animator.duration = 500
             animator.addUpdateListener {
                 curUpdatePercent = it.animatedValue as Float / 100f
+                if (isMenuOpen) newLayerUpdatePercent = max(newLayerUpdatePercent - 4, 0)
+                else newLayerUpdatePercent = min(newLayerUpdatePercent + 5, 100)
                 if (!isMenuOpen) openMenu()
                 else closeMenu()
+                invalidate()
             }
             if (!isMenuOpen) animator.interpolator = BounceInterpolator()
             else animator.interpolator = AnticipateInterpolator()
-
-            layerAnimator = ValueAnimator.ofInt(0, 100)
-            layerAnimator.duration = 200
-//            layerAnimator.interpolator = AccelerateInterpolator()
-            layerAnimator.addUpdateListener {
-                newLayerUpdatePercent = it.animatedValue as Int
-                invalidate()
-            }
-
-            layerAnimator.start()
             animator.start()
         }
 
@@ -103,28 +94,27 @@ class MenuList : FrameLayout {
         addView(fabMenu, params)
     }
 
-    // TODO bug, 闪烁
     override fun onDraw(canvas: Canvas?) {
-        if (oldLayerUpdatePercent != newLayerUpdatePercent) {
-            if (!isOpenLayer) {
-                canvas?.drawCircle(fabMenu.x,
-                    fabMenu.y,
-                    MAX_RADIUS * (1 - (newLayerUpdatePercent / 100f)),
-                    paint
-                )
-            } else {
-                canvas?.drawCircle(fabMenu.x,
-                    fabMenu.y,
-                    MAX_RADIUS * (newLayerUpdatePercent / 100f),
-                    paint
-                )
-            }
-            oldLayerUpdatePercent = newLayerUpdatePercent
+        if (isMenuOpen) {
+            canvas?.drawCircle(fabMenu.x,
+                fabMenu.y,
+                MAX_RADIUS * (newLayerUpdatePercent / 100f),
+                paint
+            )
+        } else {
+            canvas?.drawCircle(fabMenu.x,
+                fabMenu.y,
+                MAX_RADIUS * (newLayerUpdatePercent / 100f),
+                paint
+            )
         }
     }
 
     private fun openMenu() {
-        if (curUpdatePercent >= 1.0f) isMenuOpen = true
+        if (curUpdatePercent >= 1.0f) {
+            isMenuOpen = true
+            newLayerUpdatePercent = 100
+        }
         val x = fabMenu.x
         val y = fabMenu.y
         fabSetting.apply {
@@ -163,7 +153,10 @@ class MenuList : FrameLayout {
     }
 
     private fun closeMenu() {
-        if (curUpdatePercent >= 1.0f) isMenuOpen = false
+        if (curUpdatePercent >= 1.0f) {
+            isMenuOpen = false
+            newLayerUpdatePercent = 0
+        }
         var fabX = fabMenu.x.toInt() - RADIUS
         var fabY = fabMenu.y.toInt() - RADIUS
         fabSetting.apply {
