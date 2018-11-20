@@ -26,6 +26,7 @@ class GifPlayActivity : AppCompatActivity(), IGifView {
     private lateinit var gifBean: GifBean
     private lateinit var presenter: GifPlayPresenter
     private var isInit = false
+    private var curFragment: GifPlayFragment? = null
     private val pageChangeListener = object : ViewPager.OnPageChangeListener {
         private var lastIndex = 0
         private var isChanged = false
@@ -45,10 +46,10 @@ class GifPlayActivity : AppCompatActivity(), IGifView {
                     presenter.loadMorePage(false)
                     Log.d("@HusterYP", "loadPre")
                 }
-                val curPage =
+                 curFragment =
                     supportFragmentManager.findFragmentByTag("android:switcher:${play_pager.id}:${play_pager.currentItem}") as GifPlayFragment
-//                curPage.initPlay()
-                presenter.cacheVideo(curPage.gifBean)
+//                curFragment!!.initPlay()
+                presenter.cacheVideo(curFragment!!.gifBean)
             }
             if (isChanged) {
                 val lastPage =
@@ -115,7 +116,7 @@ class GifPlayActivity : AppCompatActivity(), IGifView {
         play_pager.adapter?.notifyDataSetChanged()
     }
 
-    override fun showProgress(progress: Int) {
-
+    override fun updateProgress(progress: Float) {
+        runOnUiThread { curFragment?.updateProgress(progress) }
     }
 }

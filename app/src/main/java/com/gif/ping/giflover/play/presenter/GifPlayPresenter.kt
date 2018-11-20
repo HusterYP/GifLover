@@ -1,6 +1,5 @@
 package com.gif.ping.giflover.play.presenter
 
-import android.util.Log
 import com.example.yuanping.gifbin.bean.GifBean
 import com.gif.ping.giflover.play.module.GifPlayModule
 
@@ -15,22 +14,22 @@ class GifPlayPresenter : GifPlayModule.OnStateChangeListener {
     private var curGif: GifBean? = null
 
     constructor(page: Int, tag: String, gifView: IGifView) {
-        module = GifPlayModule(page, tag)
+        module = GifPlayModule(page, tag, this)
         this.gifView = gifView
     }
 
     fun initPlaySet(curGif: GifBean? = null) {
-        module.initPlaySet(this)
+        module.initPlaySet()
         this.curGif = curGif
     }
 
     fun loadMorePage(isNext: Boolean = true) {
-        if (isNext) module.loadMorePlaySet(this, true)
-        else module.loadMorePlaySet(this, false)
+        if (isNext) module.loadMorePlaySet(true)
+        else module.loadMorePlaySet(false)
     }
 
     fun cacheVideo(gifBean: GifBean) {
-        gifView.showProgress(0)
+        gifView.updateProgress(0f)
         module.downloadVideo(gifBean)
     }
 
@@ -62,5 +61,9 @@ class GifPlayPresenter : GifPlayModule.OnStateChangeListener {
     }
 
     override fun downloadSucceed() {
+    }
+
+    override fun onProgressChange(progress: Float) {
+        gifView.updateProgress(progress)
     }
 }

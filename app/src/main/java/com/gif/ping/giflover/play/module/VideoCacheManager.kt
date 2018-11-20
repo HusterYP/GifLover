@@ -13,22 +13,34 @@ import java.net.URL
  * 由于服务器不支持断点续传, 所以无法加入断点续传功能
  */
 
-class VideoCacheManager private constructor() {
+class VideoCacheManager {
+
+    interface OnDownLoadState {
+        fun postProgress(progress: Float)
+        fun downLoadError()
+        fun downLoadSucceed()
+    }
+
     private lateinit var gifBean: GifBean
     private var oldConnection: HttpURLConnection? = null
     private var buffer = ByteArray(1024)
+    private var downLoadState: OnDownLoadState
 
     companion object {
         private var instance: VideoCacheManager? = null
 
-        fun getInstance(): VideoCacheManager {
+        fun getInstance(downLoadState: OnDownLoadState): VideoCacheManager {
             if (instance == null) {
                 synchronized(VideoCacheManager::class.java) {
-                    if (instance == null) instance = VideoCacheManager()
+                    if (instance == null) instance = VideoCacheManager(downLoadState)
                 }
             }
             return instance!!
         }
+    }
+
+    private constructor(downLoadState: OnDownLoadState) {
+        this.downLoadState = downLoadState
     }
 
     fun download(gifBean: GifBean) {
@@ -41,20 +53,26 @@ class VideoCacheManager private constructor() {
             connection.connectTimeout = 5000
             connection.readTimeout = 5000
             connection.requestMethod = "GET"
+            connection.doOutput = false
+            connection.doInput = true
+            connection.useCaches = false
             connection.connect()
             var length = 0
-            if (connection.responseCode == HttpURLConnection.HTTP_OK) {
-                oldConnection = connection
-                connection.inputStream.use {
-                    while (true) {
-                        length = it!!.read(buffer)
-                        if (length == -1) break
-                    }
+            oldConnection = connection
+            val totalLength = connection.contentLength
+            var curLength = 0
+            connection.inputStream.use {
+                while (true) {
+                    length = it!!.read(buffer)
+                    if (length <= -1) break
+                    curLength += length
+                    downLoadState.postProgress(curLength.toFloat() / totalLength)
                 }
+                downLoadState.downLoadSucceed()
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Log.d("@HusterYP","Error ${e.message} $connection  ${gifBean.title}")
+            Log.d("@HusterYP","Error ${e.message} ; ${gifBean.title}")
         } finally {
             connection?.disconnect()
         }

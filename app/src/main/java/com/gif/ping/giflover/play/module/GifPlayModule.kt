@@ -1,6 +1,5 @@
 package com.gif.ping.giflover.play.module
 
-import android.support.annotation.MainThread
 import android.util.Log
 import com.example.yuanping.gifbin.bean.GifBean
 import com.example.yuanping.gifbin.utils.ParseUtil
@@ -15,10 +14,11 @@ import java.util.*
  * @email: husteryp@gmail.com
  * @description:
  */
-class GifPlayModule {
+class GifPlayModule : VideoCacheManager.OnDownLoadState {
     private var firstPage = 1
     private var lastPage = 1
     private var tag: String
+    private var stateChangeListener: OnStateChangeListener
 
     interface OnStateChangeListener {
         fun onInitPlaySucceed(gifBeans: ArrayList<GifBean>)
@@ -26,15 +26,17 @@ class GifPlayModule {
         fun loadMoreSucceed(gifBeans: ArrayList<GifBean>, isNext: Boolean = true)
         fun downloadSucceed()
         fun downloadError()
+        fun onProgressChange(progress: Float)
     }
 
-    constructor(page: Int, tag: String) {
+    constructor(page: Int, tag: String, stateChangeListener: OnStateChangeListener) {
         firstPage = page
         lastPage = page
         this.tag = tag
+        this.stateChangeListener = stateChangeListener
     }
 
-    fun initPlaySet(stateChangeListener: OnStateChangeListener) {
+    fun initPlaySet() {
         ParseUtil.parseHtml(tag, firstPage)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
@@ -46,7 +48,7 @@ class GifPlayModule {
             }
     }
 
-    fun loadMorePlaySet(stateChangeListener: OnStateChangeListener, isNext: Boolean = true) {
+    fun loadMorePlaySet( isNext: Boolean = true) {
         when {
             isNext -> ParseUtil.parseHtml(tag,
                 ++lastPage
@@ -73,10 +75,8 @@ class GifPlayModule {
     }
 
     fun downloadVideo(gifBean: GifBean) {
-        Log.d("@HusterYP","page selected ${gifBean.title}")
-
         Observable.create(ObservableOnSubscribe<String> {
-            val downloadManager = VideoCacheManager.getInstance()
+            val downloadManager = VideoCacheManager.getInstance(this)
             downloadManager.download(gifBean)
             it.onNext("")
         })
@@ -86,6 +86,16 @@ class GifPlayModule {
     }
 
     fun cancel() {
-        VideoCacheManager.getInstance().cancelLast()
+        VideoCacheManager.getInstance(this).cancelLast()
+    }
+
+    override fun postProgress(progress: Float) {
+        stateChangeListener.onProgressChange(progress)
+    }
+
+    override fun downLoadError() {
+    }
+
+    override fun downLoadSucceed() {
     }
 }

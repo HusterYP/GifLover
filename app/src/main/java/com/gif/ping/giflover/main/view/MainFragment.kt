@@ -28,12 +28,14 @@ import kotlinx.android.synthetic.main.fragment_main.*
 @SuppressLint("ValidFragment")
 class MainFragment : Fragment, IMainView {
 
-    private val presenter: MainPresenter
+    private var presenter: MainPresenter? = null
     private var refresh: SwipeRefreshLayout? = null
     private var isInit = false
     private var rootView: View? = null // 缓存rootView
     private lateinit var mainRecycler: RecyclerView
     private lateinit var adapter: MainRecyclerAdapter
+
+    constructor(): super()
 
     constructor(title: String) : super() {
         presenter = MainPresenter(this, MainModule(title))
@@ -59,14 +61,14 @@ class MainFragment : Fragment, IMainView {
                 }
             }
             mainRecycler = rootView!!.findViewById(R.id.fragment_rv_main)
-            mainRecycler.addOnScrollListener(LoadMoreListener(presenter))
+            mainRecycler.addOnScrollListener(LoadMoreListener(presenter!!))
         }
         return rootView
     }
 
     fun initView() {
         if (!isInit) {
-            presenter.startRefresh()
+            presenter?.startRefresh()
             isInit = true
         }
     }

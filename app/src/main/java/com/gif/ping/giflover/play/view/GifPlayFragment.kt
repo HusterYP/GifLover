@@ -23,6 +23,7 @@ import com.google.android.exoplayer2.source.ExtractorMediaSource
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
+import kotlinx.android.synthetic.main.fragment_gif_play.*
 
 /**
  * @created by PingYuan at 11/10/18
@@ -75,5 +76,9 @@ class GifPlayFragment : Fragment {
         player?.stop(true)
         playerView.player?.release()
         playerView.player = null
+    }
+
+    fun updateProgress(progress: Float) {
+        cache_progress.text = progress.toString()
     }
 }
