@@ -10,4 +10,5 @@ import com.example.yuanping.gifbin.bean.GifBean
 interface IGifView {
     fun setAdapter(gifBeans: ArrayList<GifBean>, position: Int)
     fun updateAdapter(gifBeans: ArrayList<GifBean>, isNext: Boolean = true)
+    fun showProgress(progress: Int)
 }

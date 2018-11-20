@@ -47,7 +47,8 @@ class GifPlayActivity : AppCompatActivity(), IGifView {
                 }
                 val curPage =
                     supportFragmentManager.findFragmentByTag("android:switcher:${play_pager.id}:${play_pager.currentItem}") as GifPlayFragment
-                curPage.initPlay()
+//                curPage.initPlay()
+                presenter.cacheVideo(curPage.gifBean)
             }
             if (isChanged) {
                 val lastPage =
@@ -73,6 +74,11 @@ class GifPlayActivity : AppCompatActivity(), IGifView {
         }
     }
 
+    override fun onDestroy() {
+        presenter.cancelDownload()
+        super.onDestroy()
+    }
+
     private fun initView() {
         immersiveStatusBar((play_root.background as ColorDrawable).color)
         supportActionBar?.hide()
@@ -82,6 +88,9 @@ class GifPlayActivity : AppCompatActivity(), IGifView {
         page = intent.getIntExtra(PAGE, 1)
 
         play_pager.addOnPageChangeListener(pageChangeListener)
+        // TODO bug: 为什么点击第一个Item的时候不会调用onPageSelected, 而点击其他Item会调用onPageSelected
+        // 其他Item通过play_pager.currentItem = position就可以调用到onPageSelected了
+        play_pager.post { if (play_pager.currentItem == 0) pageChangeListener.onPageSelected(0) }
 
         presenter = GifPlayPresenter(page, tag, this)
     }
@@ -104,5 +113,9 @@ class GifPlayActivity : AppCompatActivity(), IGifView {
             setAdapter(gifBeans, play_pager.currentItem + size)
         }
         play_pager.adapter?.notifyDataSetChanged()
+    }
+
+    override fun showProgress(progress: Int) {
+
     }
 }

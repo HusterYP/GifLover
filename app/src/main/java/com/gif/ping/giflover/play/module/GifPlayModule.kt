@@ -1,8 +1,14 @@
 package com.gif.ping.giflover.play.module
 
+import android.support.annotation.MainThread
+import android.util.Log
 import com.example.yuanping.gifbin.bean.GifBean
 import com.example.yuanping.gifbin.utils.ParseUtil
+import io.reactivex.Observable
+import io.reactivex.ObservableOnSubscribe
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
+import java.util.*
 
 /**
  * @created by PingYuan at 11/10/18
@@ -18,6 +24,8 @@ class GifPlayModule {
         fun onInitPlaySucceed(gifBeans: ArrayList<GifBean>)
         fun noMorePlaySet()
         fun loadMoreSucceed(gifBeans: ArrayList<GifBean>, isNext: Boolean = true)
+        fun downloadSucceed()
+        fun downloadError()
     }
 
     constructor(page: Int, tag: String) {
@@ -62,5 +70,22 @@ class GifPlayModule {
                 // TODO 没有更多提示, 需要注意这里是加载更多的时候, 而不是初次加载
             }
         }
+    }
+
+    fun downloadVideo(gifBean: GifBean) {
+        Log.d("@HusterYP","page selected ${gifBean.title}")
+
+        Observable.create(ObservableOnSubscribe<String> {
+            val downloadManager = VideoCacheManager.getInstance()
+            downloadManager.download(gifBean)
+            it.onNext("")
+        })
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {  }
+    }
+
+    fun cancel() {
+        VideoCacheManager.getInstance().cancelLast()
     }
 }

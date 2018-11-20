@@ -32,7 +32,7 @@ import com.google.android.exoplayer2.util.Util
 @SuppressLint("ValidFragment")
 class GifPlayFragment : Fragment {
 
-    private var gifBean: GifBean
+    var gifBean: GifBean
     private lateinit var playerView: PlayerView
     private var player: SimpleExoPlayer? = null
 
