@@ -15,6 +15,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.example.yuanping.gifbin.bean.GifBean
 import com.gif.ping.giflover.Constant
 import com.gif.ping.giflover.R
+import com.gif.ping.giflover.widget.CacheProgressBar
 import com.gif.ping.giflover.widget.PlayerView
 import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.Player
@@ -36,6 +37,7 @@ class GifPlayFragment : Fragment {
     var gifBean: GifBean
     private lateinit var playerView: PlayerView
     private var player: SimpleExoPlayer? = null
+    private var cacheProgressBar: CacheProgressBar? = null
 
     companion object {
         fun getInstance(gifBean: GifBean): GifPlayFragment {
@@ -50,6 +52,7 @@ class GifPlayFragment : Fragment {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_gif_play, container, false)
         playerView = view.findViewById(R.id.player_view)
+        cacheProgressBar = view.findViewById(R.id.cache_progress)
         return view
     }
 
@@ -79,6 +82,6 @@ class GifPlayFragment : Fragment {
     }
 
     fun updateProgress(progress: Float) {
-        cache_progress.text = progress.toString()
+        cacheProgressBar?.updateProgress(progress)
     }
 }

@@ -61,7 +61,7 @@ class MainFragment : Fragment, IMainView {
                 }
             }
             mainRecycler = rootView!!.findViewById(R.id.fragment_rv_main)
-            mainRecycler.addOnScrollListener(LoadMoreListener(presenter!!))
+            mainRecycler.addOnScrollListener(LoadMoreListener(presenter))
         }
         return rootView
     }
@@ -114,7 +114,7 @@ class MainFragment : Fragment, IMainView {
         adapter.notifyDataSetChanged()
     }
 
-    class LoadMoreListener(val presenter: MainPresenter) : RecyclerView.OnScrollListener() {
+    class LoadMoreListener(val presenter: MainPresenter? = null) : RecyclerView.OnScrollListener() {
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             var lastVisibleItemPosition = 0
             if (recyclerView.layoutManager is LinearLayoutManager) {
@@ -122,7 +122,7 @@ class MainFragment : Fragment, IMainView {
                         (recyclerView.layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
             }
             if (newState == RecyclerView.SCROLL_STATE_IDLE && lastVisibleItemPosition + 1 == recyclerView.adapter!!.itemCount) {
-                presenter.loadMore()
+                presenter?.loadMore()
             }
         }
     }
