@@ -90,12 +90,10 @@ class MainFragment : Fragment, IMainView {
 
     // TODO
     override fun visibleLoadMore() {
-        Log.d("@HusterYP","Load More")
     }
 
     // TODO
     override fun invisibleLoadMore() {
-        Log.d("@HusterYP","Load Complete")
     }
 
     override fun noMoreData() {

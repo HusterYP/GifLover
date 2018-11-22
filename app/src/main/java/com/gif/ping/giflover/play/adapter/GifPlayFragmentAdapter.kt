@@ -20,7 +20,8 @@ class GifPlayFragmentAdapter : FragmentPagerAdapter {
     }
 
     override fun getItem(position: Int): Fragment {
-        return GifPlayFragment.getInstance(gifBeans[position])
+//        return GifPlayFragment.getInstance(gifBeans[position])
+        return GifPlayFragment(gifBeans[position])
     }
 
     override fun getCount(): Int {

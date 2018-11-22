@@ -2,6 +2,9 @@ package com.gif.ping.giflover.play.module
 
 import android.util.Log
 import com.example.yuanping.gifbin.bean.GifBean
+import com.gif.ping.giflover.Application
+import java.io.File
+import java.io.FileOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -17,17 +20,19 @@ class VideoCacheManager {
 
     interface OnDownLoadState {
         fun postProgress(progress: Float)
-        fun downLoadError()
-        fun downLoadSucceed()
+        fun downloadError()
+        fun downloadSucceed()
     }
 
     private lateinit var gifBean: GifBean
     private var oldConnection: HttpURLConnection? = null
     private var buffer = ByteArray(1024)
-    private var downLoadState: OnDownLoadState
+    private var downloadState: OnDownLoadState
+    private val MAX_CACHE_SIZE = 30
 
     companion object {
         private var instance: VideoCacheManager? = null
+        val directory = Application.context.cacheDir.absolutePath
 
         fun getInstance(downLoadState: OnDownLoadState): VideoCacheManager {
             if (instance == null) {
@@ -40,12 +45,16 @@ class VideoCacheManager {
     }
 
     private constructor(downLoadState: OnDownLoadState) {
-        this.downLoadState = downLoadState
+        this.downloadState = downLoadState
     }
 
     fun download(gifBean: GifBean) {
         this.gifBean = gifBean
         cancelLast()
+        val path = getCachePath(gifBean)
+        val file = File(path)
+        if (!file.exists()) file.createNewFile()
+        val cacheVideo = FileOutputStream(file)
         var connection: HttpURLConnection? = null
         try {
             val url = URL(gifBean.gif)
@@ -65,22 +74,42 @@ class VideoCacheManager {
                 while (true) {
                     length = it!!.read(buffer)
                     if (length <= -1) break
+                    cacheVideo.write(buffer, 0, length)
                     curLength += length
-                    downLoadState.postProgress(curLength.toFloat() / totalLength)
+                    downloadState.postProgress(curLength.toFloat() / totalLength)
                 }
-                downLoadState.downLoadSucceed()
+                cacheVideo.flush()
+                downloadState.downloadSucceed()
             }
         } catch (e: Exception) {
             e.printStackTrace()
+            if (!file.exists()) file.delete()
             Log.d("@HusterYP","Error ${e.message} ; ${gifBean.title}")
         } finally {
             connection?.disconnect()
+            cacheVideo.close()
         }
     }
 
     fun cancelLast() {
         oldConnection?.disconnect()
         oldConnection = null
+    }
+
+    fun isVideoExist(gifBean: GifBean): Boolean {
+        val file = File("$directory/${gifBean.title}")
+        return file.exists()
+    }
+
+    private fun getCachePath(gifBean: GifBean): String {
+        val file = File(directory)
+        if (file.listFiles().size >= MAX_CACHE_SIZE) {
+            file.listFiles().sortBy {
+                it.lastModified()
+            }
+            file.listFiles()[0].delete()
+        }
+        return "$directory/${gifBean.title}"
     }
 }
 

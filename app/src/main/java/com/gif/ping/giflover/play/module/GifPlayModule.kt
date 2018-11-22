@@ -75,13 +75,16 @@ class GifPlayModule : VideoCacheManager.OnDownLoadState {
     }
 
     fun downloadVideo(gifBean: GifBean) {
-        Observable.create(ObservableOnSubscribe<String> {
+        if (VideoCacheManager.getInstance(this).isVideoExist(gifBean)) {
+            stateChangeListener.downloadSucceed()
+            VideoCacheManager.getInstance(this).cancelLast()
+            return
+        }
+        Observable.create(ObservableOnSubscribe<Void> {
             val downloadManager = VideoCacheManager.getInstance(this)
             downloadManager.download(gifBean)
-            it.onNext("")
         })
             .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
             .subscribe {  }
     }
 
@@ -93,9 +96,10 @@ class GifPlayModule : VideoCacheManager.OnDownLoadState {
         stateChangeListener.onProgressChange(progress)
     }
 
-    override fun downLoadError() {
+    override fun downloadError() {
     }
 
-    override fun downLoadSucceed() {
+    override fun downloadSucceed() {
+        stateChangeListener.downloadSucceed()
     }
 }

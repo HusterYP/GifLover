@@ -40,14 +40,11 @@ class GifPlayActivity : AppCompatActivity(), IGifView {
             play_pager.post {
                 // 提前加载下一页
                 if (position + 2 == play_pager.adapter!!.count) {
-                    Log.d("@HusterYP", "loadNext")
                     presenter.loadMorePage(true)
                 } else if (position == 1) {
                     presenter.loadMorePage(false)
-                    Log.d("@HusterYP", "loadPre")
                 }
-                 curFragment =
-                    supportFragmentManager.findFragmentByTag("android:switcher:${play_pager.id}:${play_pager.currentItem}") as GifPlayFragment
+                 curFragment = supportFragmentManager.findFragmentByTag("android:switcher:${play_pager.id}:${play_pager.currentItem}") as GifPlayFragment
 //                curFragment!!.initPlay()
                 presenter.cacheVideo(curFragment!!.gifBean)
             }
@@ -77,6 +74,7 @@ class GifPlayActivity : AppCompatActivity(), IGifView {
 
     override fun onDestroy() {
         presenter.cancelDownload()
+        Log.d("@HusterYP","GifPlayActivity onDestroy ${curFragment?.tag}")
         super.onDestroy()
     }
 
@@ -118,5 +116,9 @@ class GifPlayActivity : AppCompatActivity(), IGifView {
 
     override fun updateProgress(progress: Float) {
         runOnUiThread { curFragment?.updateProgress(progress) }
+    }
+
+    override fun downloadSucceed() {
+        runOnUiThread { curFragment?.initPlay() }
     }
 }

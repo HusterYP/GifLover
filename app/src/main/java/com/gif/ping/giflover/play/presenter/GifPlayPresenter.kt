@@ -61,6 +61,7 @@ class GifPlayPresenter : GifPlayModule.OnStateChangeListener {
     }
 
     override fun downloadSucceed() {
+        gifView.downloadSucceed()
     }
 
     override fun onProgressChange(progress: Float) {
