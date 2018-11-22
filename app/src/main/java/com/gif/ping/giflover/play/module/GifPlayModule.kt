@@ -22,6 +22,7 @@ class GifPlayModule : VideoCacheManager.OnDownLoadState {
 
     interface OnStateChangeListener {
         fun onInitPlaySucceed(gifBeans: ArrayList<GifBean>)
+        fun onInitPlaySetError() // 初次加载播放列表失败
         fun noMorePlaySet()
         fun loadMoreSucceed(gifBeans: ArrayList<GifBean>, isNext: Boolean = true)
         fun downloadSucceed()
@@ -41,7 +42,7 @@ class GifPlayModule : VideoCacheManager.OnDownLoadState {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
                 if (it.size <= 0) {
-                    stateChangeListener.noMorePlaySet()
+                    stateChangeListener.onInitPlaySetError()
                 } else {
                     stateChangeListener.onInitPlaySucceed(it)
                 }
@@ -50,26 +51,22 @@ class GifPlayModule : VideoCacheManager.OnDownLoadState {
 
     fun loadMorePlaySet( isNext: Boolean = true) {
         when {
-            isNext -> ParseUtil.parseHtml(tag,
-                ++lastPage
-            ).observeOn(AndroidSchedulers.mainThread()).subscribe {
+            isNext -> ParseUtil.parseHtml(tag, ++lastPage).observeOn(AndroidSchedulers.mainThread()).subscribe {
                 if (it.size <= 0) {
-                    // TODO 没有更多提示, 需要注意这里是加载更多的时候, 而不是初次加载
+                    stateChangeListener.noMorePlaySet()
                 } else {
                     stateChangeListener.loadMoreSucceed(it, true)
                 }
             }
-            --firstPage > 0 -> ParseUtil.parseHtml(tag,
-                firstPage
-            ).observeOn(AndroidSchedulers.mainThread()).subscribe {
+            --firstPage > 0 -> ParseUtil.parseHtml(tag, firstPage).observeOn(AndroidSchedulers.mainThread()).subscribe {
                 if (it.size <= 0) {
-                    // TODO 没有更多提示, 需要注意这里是加载更多的时候, 而不是初次加载
+                    stateChangeListener.noMorePlaySet()
                 } else {
                     stateChangeListener.loadMoreSucceed(it, false)
                 }
             }
             else -> {
-                // TODO 没有更多提示, 需要注意这里是加载更多的时候, 而不是初次加载
+                stateChangeListener.noMorePlaySet()
             }
         }
     }

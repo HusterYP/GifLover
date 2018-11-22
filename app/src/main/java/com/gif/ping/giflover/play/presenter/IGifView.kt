@@ -12,4 +12,5 @@ interface IGifView {
     fun updateAdapter(gifBeans: ArrayList<GifBean>, isNext: Boolean = true)
     fun updateProgress(progress: Float)
     fun downloadSucceed()
+    fun noMorePlaySet()
 }

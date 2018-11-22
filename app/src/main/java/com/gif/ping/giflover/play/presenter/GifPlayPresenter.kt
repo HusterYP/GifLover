@@ -24,8 +24,7 @@ class GifPlayPresenter : GifPlayModule.OnStateChangeListener {
     }
 
     fun loadMorePage(isNext: Boolean = true) {
-        if (isNext) module.loadMorePlaySet(true)
-        else module.loadMorePlaySet(false)
+        module.loadMorePlaySet(isNext)
     }
 
     fun cacheVideo(gifBean: GifBean) {
@@ -50,7 +49,7 @@ class GifPlayPresenter : GifPlayModule.OnStateChangeListener {
         }
     }
 
-    override fun noMorePlaySet() {
+    override fun onInitPlaySetError() {
     }
 
     override fun loadMoreSucceed(gifBeans: ArrayList<GifBean>, isNext: Boolean) {
@@ -66,5 +65,9 @@ class GifPlayPresenter : GifPlayModule.OnStateChangeListener {
 
     override fun onProgressChange(progress: Float) {
         gifView.updateProgress(progress)
+    }
+
+    override fun noMorePlaySet() {
+        gifView.noMorePlaySet()
     }
 }

@@ -83,7 +83,7 @@ class VideoCacheManager {
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            if (!file.exists()) file.delete()
+            if (file.exists()) file.delete()
             Log.d("@HusterYP","Error ${e.message} ; ${gifBean.title}")
         } finally {
             connection?.disconnect()

@@ -3,4 +3,5 @@
     <string name="refresh_succeed">Refresh Succeed</string>
     <string name="no_more_data">没有更多啦!</string>
     <string name="no_network">网络连接不可用~</string>
+    <string name="no_more_play">No More Play Set</string>
 </resources>
